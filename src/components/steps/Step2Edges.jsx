@@ -1,7 +1,39 @@
 import { useState } from 'react';
 
-export default function Step2Edges({ edgeCandidates, onChange, onNext, onBack }) {
+export default function Step2Edges({ edgeCandidates, basicInfo, marketResearch, persona, onChange, onNext, onBack }) {
   const [inputText, setInputText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function generateEdges() {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/suggest-edges', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: basicInfo.title,
+          category: basicInfo.category,
+          marketResearch,
+          persona,
+        }),
+      });
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        throw new Error('서버 응답 오류. Vercel 환경변수(GROQ_API_KEY)가 설정됐는지 확인해주세요.');
+      }
+      if (!res.ok) throw new Error(result.error || '생성 실패');
+      onChange({ edgeCandidates: result.edges || [] });
+    } catch (e) {
+      setError('생성 실패: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function addEdge() {
     const trimmed = inputText.trim();
@@ -23,15 +55,46 @@ export default function Step2Edges({ edgeCandidates, onChange, onNext, onBack })
   return (
     <div className="card">
       <div className="flex items-center gap-3 mb-6">
-        <span className="section-badge bg-indigo-100 text-indigo-700">2</span>
+        <span className="section-badge bg-indigo-100 text-indigo-700">5</span>
         <div>
-          <h2 className="text-lg font-bold text-slate-800">상품 Edge 후보 입력</h2>
+          <h2 className="text-lg font-bold text-slate-800">상품 Edge 후보</h2>
           <p className="text-sm text-slate-500">
-            기존 강의의 소구점·강점 문구를 입력해주세요. AI가 K-디지털 버전으로 재구성합니다.
-            <span className="text-slate-400 ml-1">(없으면 건너뛰기 가능)</span>
+            AI가 앞 단계 내용을 바탕으로 소구점을 자동 생성합니다. 수정·추가도 가능해요.
           </p>
         </div>
       </div>
+
+      <div className="flex gap-2 mb-4">
+        <button
+          className="btn-primary"
+          onClick={generateEdges}
+          disabled={loading}
+        >
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              AI 생성 중...
+            </span>
+          ) : 'AI Edge 자동 생성'}
+        </button>
+        {edgeCandidates.length > 0 && (
+          <button
+            className="btn-secondary text-sm"
+            onClick={() => onChange({ edgeCandidates: [] })}
+          >
+            초기화
+          </button>
+        )}
+      </div>
+
+      {error && (
+        <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-xs text-blue-700">
@@ -67,7 +130,7 @@ export default function Step2Edges({ edgeCandidates, onChange, onNext, onBack })
         <input
           type="text"
           className="input-field flex-1 text-sm"
-          placeholder="소구점 입력 후 Enter 또는 추가 버튼"
+          placeholder="소구점 직접 추가 (Enter)"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addEdge()}
@@ -79,7 +142,7 @@ export default function Step2Edges({ edgeCandidates, onChange, onNext, onBack })
 
       <div className="flex justify-between mt-8">
         <button className="btn-secondary" onClick={onBack}>← 이전</button>
-        <button className="btn-primary" onClick={onNext}>다음 단계 →</button>
+        <button className="btn-primary" onClick={onNext}>기획안 생성 →</button>
       </div>
     </div>
   );

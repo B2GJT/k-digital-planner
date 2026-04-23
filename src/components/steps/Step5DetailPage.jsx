@@ -1,47 +1,17 @@
-import { useState } from 'react';
-
 export default function Step5DetailPage({
   data,
-  edgeCandidatesFromCrawl,
   onChange,
   onNext,
   onBack,
 }) {
-  const [newEdge, setNewEdge] = useState('');
-
   function handleChange(field, value) {
     onChange({ ...data, [field]: value });
-  }
-
-  // Step2 크롤링 Edge가 있고 아직 data.edgeCandidates가 비어있으면 초기화
-  const edges = data.edgeCandidates || [];
-
-  // 크롤 결과에서 불러오기
-  function loadFromCrawl() {
-    onChange({ ...data, edgeCandidates: edgeCandidatesFromCrawl || [] });
-  }
-
-  function addEdge() {
-    const trimmed = newEdge.trim();
-    if (!trimmed) return;
-    onChange({ ...data, edgeCandidates: [...edges, trimmed] });
-    setNewEdge('');
-  }
-
-  function updateEdge(i, v) {
-    const next = [...edges];
-    next[i] = v;
-    onChange({ ...data, edgeCandidates: next });
-  }
-
-  function removeEdge(i) {
-    onChange({ ...data, edgeCandidates: edges.filter((_, idx) => idx !== i) });
   }
 
   return (
     <div className="card">
       <div className="flex items-center gap-3 mb-6">
-        <span className="section-badge bg-indigo-100 text-indigo-700">5</span>
+        <span className="section-badge bg-indigo-100 text-indigo-700">4</span>
         <div>
           <h2 className="text-lg font-bold text-slate-800">상세페이지 구성 방향</h2>
           <p className="text-sm text-slate-500">
@@ -124,60 +94,6 @@ export default function Step5DetailPage({
           />
         </div>
 
-        {/* Edge 후보 — 상세페이지 방향 */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-semibold text-slate-700">
-              상품 Edge 후보 (AI 재구성용 원본 소구점)
-            </label>
-            {edgeCandidatesFromCrawl?.length > 0 && edges.length === 0 && (
-              <button className="text-xs text-indigo-600 hover:underline" onClick={loadFromCrawl}>
-                Step 2 크롤 결과 불러오기
-              </button>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 mb-2">
-            AI가 이 소구점들을 K-디지털 훈련 버전의 구체적인 Edge 문구로 재구성합니다.
-          </p>
-
-          {edges.length === 0 && (
-            <p className="text-sm text-slate-400 italic mb-2">없음. 아래에 직접 입력해주세요.</p>
-          )}
-
-          <div className="space-y-2 mb-2">
-            {edges.map((e, i) => (
-              <div key={i} className="flex gap-2">
-                <input
-                  type="text"
-                  className="input-field flex-1 text-sm"
-                  value={e}
-                  onChange={(ev) => updateEdge(i, ev.target.value)}
-                />
-                <button
-                  onClick={() => removeEdge(i)}
-                  className="text-slate-400 hover:text-red-500 px-2 transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            <input
-              type="text"
-              className="input-field text-sm flex-1"
-              placeholder="소구점 추가 (Enter)"
-              value={newEdge}
-              onChange={(e) => setNewEdge(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addEdge()}
-            />
-            <button className="btn-secondary text-sm px-4" onClick={addEdge}>
-              + 추가
-            </button>
-          </div>
-        </div>
-
         {/* 기획 메모 */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
@@ -199,7 +115,7 @@ export default function Step5DetailPage({
           ← 이전
         </button>
         <button className="btn-primary" onClick={onNext}>
-          기획안 생성 →
+          다음 단계 →
         </button>
       </div>
     </div>

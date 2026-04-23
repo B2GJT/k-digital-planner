@@ -23,10 +23,10 @@ const INITIAL_STATE = {
 
 const STEPS = [
   { num: 1, label: '기본 정보' },
-  { num: 2, label: 'Edge 후보' },
-  { num: 3, label: '시장조사' },
-  { num: 4, label: '타겟 페르소나' },
-  { num: 5, label: '구성 방향' },
+  { num: 2, label: '시장조사' },
+  { num: 3, label: '타겟 페르소나' },
+  { num: 4, label: '구성 방향' },
+  { num: 5, label: 'Edge 후보' },
   { num: 6, label: '기획안 초안' },
 ];
 
@@ -81,14 +81,6 @@ export default function App() {
             />
           )}
           {step === 2 && (
-            <Step2Edges
-              edgeCandidates={appData.edgeCandidates}
-              onChange={(v) => updateAppData(v)}
-              onNext={goNext}
-              onBack={goBack}
-            />
-          )}
-          {step === 3 && (
             <Step3MarketResearch
               basicInfo={appData.basicInfo}
               marketResearch={appData.marketResearch}
@@ -97,19 +89,31 @@ export default function App() {
               onBack={goBack}
             />
           )}
-          {step === 4 && (
+          {step === 3 && (
             <Step4Persona
               data={appData.persona}
+              basicInfo={appData.basicInfo}
+              marketResearch={appData.marketResearch}
               onChange={(v) => updateAppData({ persona: v })}
               onNext={goNext}
               onBack={goBack}
             />
           )}
-          {step === 5 && (
+          {step === 4 && (
             <Step5DetailPage
               data={appData.detailPage}
-              edgeCandidatesFromCrawl={appData.edgeCandidates}
               onChange={(v) => updateAppData({ detailPage: v })}
+              onNext={goNext}
+              onBack={goBack}
+            />
+          )}
+          {step === 5 && (
+            <Step2Edges
+              edgeCandidates={appData.edgeCandidates}
+              basicInfo={appData.basicInfo}
+              marketResearch={appData.marketResearch}
+              persona={appData.persona}
+              onChange={(v) => updateAppData(v)}
               onNext={goNext}
               onBack={goBack}
             />

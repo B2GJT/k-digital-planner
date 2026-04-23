@@ -13,7 +13,13 @@ export default function Step3MarketResearch({ basicInfo, marketResearch, onChang
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: basicInfo.title, category: basicInfo.category }),
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('서버 응답 오류. Vercel 환경변수(GROQ_API_KEY)가 설정됐는지 확인해주세요.');
+      }
       if (!res.ok) throw new Error(data.error || '생성 실패');
       onChange({ marketResearch: data.summary });
     } catch (e) {
@@ -26,7 +32,7 @@ export default function Step3MarketResearch({ basicInfo, marketResearch, onChang
   return (
     <div className="card">
       <div className="flex items-center gap-3 mb-6">
-        <span className="section-badge bg-indigo-100 text-indigo-700">3</span>
+        <span className="section-badge bg-indigo-100 text-indigo-700">2</span>
         <div>
           <h2 className="text-lg font-bold text-slate-800">시장조사</h2>
           <p className="text-sm text-slate-500">

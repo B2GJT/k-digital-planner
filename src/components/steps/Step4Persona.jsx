@@ -1,4 +1,38 @@
-export default function Step4Persona({ data, onChange, onNext, onBack }) {
+import { useState } from 'react';
+
+export default function Step4Persona({ data, basicInfo, marketResearch, onChange, onNext, onBack }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function generatePersona() {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/suggest-persona', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: basicInfo.title,
+          category: basicInfo.category,
+          marketResearch,
+        }),
+      });
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        throw new Error('서버 응답 오류. Vercel 환경변수(GROQ_API_KEY)가 설정됐는지 확인해주세요.');
+      }
+      if (!res.ok) throw new Error(result.error || '생성 실패');
+      onChange({ ...data, ...result });
+    } catch (e) {
+      setError('생성 실패: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function handleChange(field, value) {
     onChange({ ...data, [field]: value });
   }
@@ -6,17 +40,48 @@ export default function Step4Persona({ data, onChange, onNext, onBack }) {
   return (
     <div className="card">
       <div className="flex items-center gap-3 mb-6">
-        <span className="section-badge bg-indigo-100 text-indigo-700">4</span>
+        <span className="section-badge bg-indigo-100 text-indigo-700">3</span>
         <div>
           <h2 className="text-lg font-bold text-slate-800">타겟 페르소나</h2>
           <p className="text-sm text-slate-500">
-            AI가 구체적인 페르소나 문서를 생성할 수 있도록 기초 정보를 입력해주세요.
+            AI가 초안을 자동 생성하거나, 직접 입력 후 수정해주세요.
           </p>
         </div>
       </div>
 
+      <div className="flex gap-2 mb-5">
+        <button
+          className="btn-primary"
+          onClick={generatePersona}
+          disabled={loading}
+        >
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              AI 생성 중...
+            </span>
+          ) : 'AI 페르소나 자동 생성'}
+        </button>
+        {(data.mainPersona || data.subPersona || data.painPoints) && (
+          <button
+            className="btn-secondary text-sm"
+            onClick={() => onChange({ mainPersona: '', subPersona: '', painPoints: '' })}
+          >
+            초기화
+          </button>
+        )}
+      </div>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       <div className="space-y-6">
-        {/* 메인 페르소나 */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1">
             메인 페르소나
@@ -33,14 +98,10 @@ export default function Step4Persona({ data, onChange, onNext, onBack }) {
           />
         </div>
 
-        {/* 서브 페르소나 */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1">
             서브 페르소나 <span className="text-slate-400 font-normal">(선택)</span>
           </label>
-          <p className="text-xs text-slate-500 mb-2">
-            메인 외에 잠재 수강생이 될 수 있는 다른 유형을 간략히 적어주세요.
-          </p>
           <textarea
             rows={2}
             className="input-field resize-none"
@@ -50,14 +111,12 @@ export default function Step4Persona({ data, onChange, onNext, onBack }) {
           />
         </div>
 
-        {/* 페인포인트 힌트 */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1">
             핵심 페인포인트 힌트 <span className="text-slate-400 font-normal">(선택)</span>
           </label>
           <p className="text-xs text-slate-500 mb-2">
             수강생이 겪고 있는 어려움이나 니즈를 키워드 또는 문장으로 적어주세요.
-            AI가 구체적인 1인칭 문장으로 확장해 줍니다.
           </p>
           <textarea
             rows={3}
@@ -69,23 +128,17 @@ export default function Step4Persona({ data, onChange, onNext, onBack }) {
         </div>
       </div>
 
-      {/* 안내 박스 */}
       <div className="mt-5 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-xs text-blue-700">
-          <strong>💡 AI 생성 항목:</strong> 페르소나 정의 문장, 선정 근거, 구체적 페인포인트
-          1인칭 문장, 기대 결과물은 AI가 자동으로 생성합니다.
+          <strong>AI 생성 항목:</strong> 페르소나 정의 문장, 선정 근거, 구체적 페인포인트
+          1인칭 문장, 기대 결과물은 최종 기획안 생성 시 자동으로 만들어집니다.
           여기서는 방향성 힌트만 입력하면 됩니다.
         </p>
       </div>
 
-      {/* 네비게이션 */}
       <div className="flex justify-between mt-8">
-        <button className="btn-secondary" onClick={onBack}>
-          ← 이전
-        </button>
-        <button className="btn-primary" onClick={onNext}>
-          다음 단계 →
-        </button>
+        <button className="btn-secondary" onClick={onBack}>← 이전</button>
+        <button className="btn-primary" onClick={onNext}>다음 단계 →</button>
       </div>
     </div>
   );
