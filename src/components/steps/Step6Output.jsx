@@ -376,15 +376,11 @@ export default function Step6Output({ appData, onChange, onBack, onReset }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs font-semibold text-slate-500 mb-1">정의</p>
-                    <p className="text-sm text-slate-700 leading-relaxed">
-                      {section02.mainPersona.definition}
-                    </p>
+                    <BulletText text={section02.mainPersona.definition} />
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-slate-500 mb-1">선정 근거</p>
-                    <p className="text-sm text-slate-700 leading-relaxed">
-                      {section02.mainPersona.rationale}
-                    </p>
+                    <BulletText text={section02.mainPersona.rationale} />
                   </div>
                 </div>
                 <div className="mt-4">
@@ -404,7 +400,7 @@ export default function Step6Output({ appData, onChange, onBack, onReset }) {
                 {section02.mainPersona.outcomes && (
                   <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-xs font-semibold text-slate-500 mb-1">기대 결과물</p>
-                    <p className="text-sm text-green-800">{section02.mainPersona.outcomes}</p>
+                    <BulletText text={section02.mainPersona.outcomes} />
                   </div>
                 )}
               </div>
@@ -421,7 +417,7 @@ export default function Step6Output({ appData, onChange, onBack, onReset }) {
                     {section02.subPersona.name}
                   </h4>
                 </div>
-                <p className="text-sm text-slate-700 mb-3">{section02.subPersona.definition}</p>
+                <div className="mb-3"><BulletText text={section02.subPersona.definition} /></div>
                 <ul className="space-y-1.5">
                   {(section02.subPersona.painPoints || []).map((p, i) => (
                     <li key={i} className="flex gap-2 p-2.5 bg-slate-50 rounded-lg">
@@ -515,9 +511,7 @@ export default function Step6Output({ appData, onChange, onBack, onReset }) {
             {/* Edge */}
             <SubSection title="메인 상품 Edge (AI 생성)">
               <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-sm text-amber-900 leading-relaxed font-medium">
-                  {section03.mainEdge}
-                </p>
+                <BulletText text={section03.mainEdge} />
               </div>
             </SubSection>
 
