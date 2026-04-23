@@ -44,6 +44,25 @@ function SectionCard({ badge, badgeColor, title, copyText, children }) {
   );
 }
 
+// ─── 불렛 텍스트 렌더러 ───────────────────────────────────────────
+function BulletText({ text }) {
+  if (!text) return null;
+  const lines = text.split('\n').filter((l) => l.trim());
+  return (
+    <ul className="space-y-1.5">
+      {lines.map((line, i) => {
+        const clean = line.replace(/^[-•*]\s*/, '').trim();
+        return (
+          <li key={i} className="flex gap-2 text-sm text-slate-700 leading-relaxed">
+            <span className="text-indigo-400 shrink-0 mt-0.5">•</span>
+            <span>{clean}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 // ─── 항목 행 ──────────────────────────────────────────────────────
 function FieldRow({ label, value, highlight }) {
   const isPlaceholder = value === '직접 입력 필요' || !value;
@@ -293,19 +312,13 @@ export default function Step6Output({ appData, onChange, onBack, onReset }) {
         >
           <div className="space-y-5">
             <SubSection title="시장 · 트렌드 분석">
-              <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
-                {section01.marketTrend}
-              </p>
+              <BulletText text={section01.marketTrend} />
             </SubSection>
             <SubSection title="국비지원 유사 과정 경쟁 현황">
-              <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
-                {section01.competitorAnalysis}
-              </p>
+              <BulletText text={section01.competitorAnalysis} />
             </SubSection>
             <SubSection title="B2C 경쟁사 분석">
-              <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
-                {section01.competitorComparison}
-              </p>
+              <BulletText text={section01.competitorComparison} />
             </SubSection>
             {section01.sources?.length > 0 && (
               <SubSection title="출처">
