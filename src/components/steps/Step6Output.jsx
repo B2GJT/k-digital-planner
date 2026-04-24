@@ -84,6 +84,16 @@ function FieldRow({ label, value, highlight }) {
   );
 }
 
+// ─── 불렛 텍스트 → • 형식 변환 ──────────────────────────────────
+function toBullets(text) {
+  if (!text) return '';
+  return text
+    .split('\n')
+    .filter((l) => l.trim())
+    .map((l) => '• ' + l.replace(/^[-•*]\s*/, '').trim())
+    .join('\n');
+}
+
 // ─── 기획안 전체 텍스트 조립 ─────────────────────────────────────
 function buildFullText(plan) {
   if (!plan) return '';
@@ -105,17 +115,17 @@ function buildFullText(plan) {
     lines.push('01. 시장 조사');
     lines.push('═══════════════════════════════════════');
     lines.push('[시장/트렌드 분석]');
-    lines.push(section01.marketTrend || '');
+    lines.push(toBullets(section01.marketTrend));
     lines.push('');
     lines.push('[유사 과정 경쟁 현황]');
-    lines.push(section01.competitorAnalysis || '');
+    lines.push(toBullets(section01.competitorAnalysis));
     lines.push('');
     lines.push('[경쟁사 분석]');
-    lines.push(section01.competitorComparison || '');
+    lines.push(toBullets(section01.competitorComparison));
     if (section01.sources?.length) {
       lines.push('');
       lines.push('[출처]');
-      section01.sources.forEach((s) => lines.push(`- ${s.title}: ${s.url}`));
+      section01.sources.forEach((s) => lines.push(`• ${s.title}: ${s.url}`));
     }
     lines.push('');
   }
@@ -127,19 +137,23 @@ function buildFullText(plan) {
     const mp = section02.mainPersona;
     if (mp) {
       lines.push(`[메인 페르소나] ${mp.name}`);
-      lines.push(mp.definition || '');
-      lines.push(`선정 근거: ${mp.rationale || ''}`);
-      lines.push('페인포인트:');
-      (mp.painPoints || []).forEach((p) => lines.push(`  • ${p}`));
-      lines.push(`기대 결과물: ${mp.outcomes || ''}`);
+      lines.push('[정의]');
+      lines.push(toBullets(mp.definition));
+      lines.push('[선정 근거]');
+      lines.push(toBullets(mp.rationale));
+      lines.push('[페인포인트]');
+      (mp.painPoints || []).forEach((p) => lines.push(`• ${p}`));
+      lines.push('[기대 결과물]');
+      lines.push(toBullets(mp.outcomes));
       lines.push('');
     }
     const sp = section02.subPersona;
     if (sp) {
       lines.push(`[서브 페르소나] ${sp.name}`);
-      lines.push(sp.definition || '');
-      lines.push('페인포인트:');
-      (sp.painPoints || []).forEach((p) => lines.push(`  • ${p}`));
+      lines.push('[정의]');
+      lines.push(toBullets(sp.definition));
+      lines.push('[페인포인트]');
+      (sp.painPoints || []).forEach((p) => lines.push(`• ${p}`));
       lines.push('');
     }
   }
@@ -163,10 +177,10 @@ function buildFullText(plan) {
     lines.push(section03.finalProject || '직접 입력 필요');
     lines.push('');
     lines.push('[메인 Edge]');
-    lines.push(section03.mainEdge || '');
+    lines.push(toBullets(section03.mainEdge));
     lines.push('');
     lines.push('[서브 Edge]');
-    (section03.subEdges || []).forEach((e, i) => lines.push(`${i + 1}. ${e}`));
+    (section03.subEdges || []).forEach((e) => lines.push(`• ${e}`));
   }
 
   return lines.join('\n');
@@ -485,27 +499,19 @@ export default function Step6Output({ appData, onChange, onBack, onReset }) {
             </div>
 
             <SubSection title="커리큘럼">
-              <p
-                className={`text-sm whitespace-pre-wrap leading-relaxed ${
-                  section03.curriculum === '직접 입력 필요'
-                    ? 'text-amber-600 italic'
-                    : 'text-slate-700'
-                }`}
-              >
-                {section03.curriculum}
-              </p>
+              {section03.curriculum === '직접 입력 필요' || !section03.curriculum ? (
+                <p className="text-sm text-amber-600 italic">직접 입력 필요</p>
+              ) : (
+                <BulletText text={section03.curriculum} />
+              )}
             </SubSection>
 
             <SubSection title="파이널 프로젝트">
-              <p
-                className={`text-sm ${
-                  section03.finalProject === '직접 입력 필요'
-                    ? 'text-amber-600 italic'
-                    : 'text-slate-700'
-                }`}
-              >
-                {section03.finalProject}
-              </p>
+              {section03.finalProject === '직접 입력 필요' || !section03.finalProject ? (
+                <p className="text-sm text-amber-600 italic">직접 입력 필요</p>
+              ) : (
+                <BulletText text={section03.finalProject} />
+              )}
             </SubSection>
 
             {/* Edge */}
@@ -516,14 +522,11 @@ export default function Step6Output({ appData, onChange, onBack, onReset }) {
             </SubSection>
 
             <SubSection title="서브 Edge (AI 생성)">
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {(section03.subEdges || []).map((e, i) => (
-                  <li
-                    key={i}
-                    className="flex gap-3 p-3 bg-slate-50 border border-slate-200 rounded-lg"
-                  >
-                    <span className="text-slate-400 font-bold text-sm shrink-0">{i + 1}</span>
-                    <span className="text-sm text-slate-700">{e}</span>
+                  <li key={i} className="flex gap-2 text-sm text-slate-700 leading-relaxed">
+                    <span className="text-indigo-400 shrink-0 mt-0.5">•</span>
+                    <span>{e}</span>
                   </li>
                 ))}
               </ul>
