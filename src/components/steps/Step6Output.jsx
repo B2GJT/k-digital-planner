@@ -44,21 +44,32 @@ function SectionCard({ badge, badgeColor, title, copyText, children }) {
   );
 }
 
+// ─── 텍스트 → 불렛 항목 배열 변환 ───────────────────────────────
+function parseToItems(text) {
+  if (!text) return [];
+  // 이미 줄바꿈으로 구분된 경우
+  const byNewline = text.split('\n').map((l) => l.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+  if (byNewline.length > 1) return byNewline;
+  // 줄바꿈 없는 단락 → 마침표/느낌표/물음표 뒤 공백 기준으로 분리
+  const bySentence = text
+    .split(/(?<=[다요임함]\.?\s)|(?<=\.\s)|(?<=\.\s*$)/)
+    .map((s) => s.replace(/^[-•*]\s*/, '').trim())
+    .filter((s) => s.length > 3);
+  return bySentence.length > 1 ? bySentence : byNewline;
+}
+
 // ─── 불렛 텍스트 렌더러 ───────────────────────────────────────────
 function BulletText({ text }) {
   if (!text) return null;
-  const lines = text.split('\n').filter((l) => l.trim());
+  const items = parseToItems(text);
   return (
     <ul className="space-y-1.5">
-      {lines.map((line, i) => {
-        const clean = line.replace(/^[-•*]\s*/, '').trim();
-        return (
-          <li key={i} className="flex gap-2 text-sm text-slate-700 leading-relaxed">
-            <span className="text-indigo-400 shrink-0 mt-0.5">•</span>
-            <span>{clean}</span>
-          </li>
-        );
-      })}
+      {items.map((item, i) => (
+        <li key={i} className="flex gap-2 text-sm text-slate-700 leading-relaxed">
+          <span className="text-indigo-400 shrink-0 mt-0.5">•</span>
+          <span>{item}</span>
+        </li>
+      ))}
     </ul>
   );
 }
