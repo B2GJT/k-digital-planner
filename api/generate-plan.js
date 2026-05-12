@@ -1,5 +1,5 @@
 import { setCors, handleOptions } from './_lib/cors.js';
-import Groq from 'groq-sdk';
+import Anthropic from '@anthropic-ai/sdk';
 
 const SYSTEM_PROMPT = `당신은 K-디지털 기초역량 훈련 과정 기획 전문가입니다.
 
@@ -102,18 +102,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const completion = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: buildUserMessage(data) },
-      ],
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
       max_tokens: 4096,
       temperature: 0.4,
+      system: [
+        {
+          type: 'text',
+          text: SYSTEM_PROMPT,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+      messages: [
+        { role: 'user', content: buildUserMessage(data) },
+      ],
     });
 
-    const text = completion.choices[0].message.content;
+    const textBlock = message.content.find((b) => b.type === 'text');
+    const text = textBlock?.text ?? '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return res.status(200).json({ success: false, rawText: text, error: 'JSON 파싱 실패' });
@@ -141,9 +148,11 @@ export default async function handler(req, res) {
       success: true,
       plan,
       usage: {
-        inputTokens: completion.usage?.prompt_tokens ?? 0,
-        outputTokens: completion.usage?.completion_tokens ?? 0,
-        totalTokens: completion.usage?.total_tokens ?? 0,
+        inputTokens: message.usage?.input_tokens ?? 0,
+        outputTokens: message.usage?.output_tokens ?? 0,
+        totalTokens: (message.usage?.input_tokens ?? 0) + (message.usage?.output_tokens ?? 0),
+        cacheReadTokens: message.usage?.cache_read_input_tokens ?? 0,
+        cacheCreationTokens: message.usage?.cache_creation_input_tokens ?? 0,
       },
     });
   } catch (err) {
