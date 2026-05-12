@@ -6,7 +6,7 @@ K-디지털 기초역량 훈련 과정의 **기획안 초안을 자동으로 생
 ## 주요 기능
 
 - 6단계 스텝 방식으로 기획 정보를 순차 입력
-- AI(Groq LLM)가 시장조사 · 타겟 페르소나 · Edge 후보 · 기획안 초안 자동 생성
+- AI(Claude Sonnet)가 시장조사 · 타겟 페르소나 · Edge 후보 · 기획안 초안 자동 생성
 - 생성된 기획안 텍스트 화면 출력 및 복사 지원
 
 ## 사용 흐름
@@ -23,7 +23,7 @@ K-디지털 기초역량 훈련 과정의 **기획안 초안을 자동으로 생
 ## 기술 스택
 
 - **Frontend:** React 18, Vite, Tailwind CSS
-- **AI:** Groq API (llama-3.3-70b-versatile)
+- **AI:** Claude API (claude-sonnet-4-6)
 - **배포:** Vercel (서버리스 함수)
 
 ## 로컬 실행 방법
@@ -44,7 +44,7 @@ npm run dev
 
 | 변수명 | 설명 |
 |--------|------|
-| `GROQ_API_KEY` | Groq API 키 ([console.groq.com](https://console.groq.com)에서 발급) |
+| `ANTHROPIC_API_KEY` | Anthropic API 키 ([console.anthropic.com](https://console.anthropic.com)에서 발급) |
 
 ## 주의사항
 
