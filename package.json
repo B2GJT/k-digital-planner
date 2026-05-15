@@ -1,23 +1,16 @@
 {
   "name": "k-digital-planner",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 5173",
-    "build": "vite build",
-    "preview": "vite preview"
+    "run": "node scripts/run-project.js",
+    "extract": "node scripts/extract-cr.js",
+    "step:research": "node scripts/step-01-research.js",
+    "step:persona": "node scripts/step-02-persona.js",
+    "step:edge": "node scripts/step-03-edge.js",
+    "step:final": "node scripts/step-04-final-materials.js",
+    "test:sample": "set CODEX_DRY_RUN=1&& set CODEX_AUTO_YES=1&& node scripts/run-project.js projects/sample-project"
   },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.55.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
-    "vite": "^6.0.7"
-  }
+  "dependencies": {}
 }
