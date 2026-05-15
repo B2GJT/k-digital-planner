@@ -5,3 +5,7 @@ dist/
 .env.*.local
 .vercel
 *.log
+projects/*/extracted/
+projects/*/results/
+!projects/sample-project/extracted/.gitkeep
+!projects/sample-project/results/.gitkeep
