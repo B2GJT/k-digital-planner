@@ -1,11 +1,7 @@
 node_modules/
 dist/
+logs/
+projects/
 .env
 .env.local
 .env.*.local
-.vercel
-*.log
-projects/*/extracted/
-projects/*/results/
-!projects/sample-project/extracted/.gitkeep
-!projects/sample-project/results/.gitkeep
