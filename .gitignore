@@ -1,7 +1,8 @@
 node_modules/
 dist/
+logs/
+projects/
 .env
 .env.local
 .env.*.local
-.vercel
-*.log
+
