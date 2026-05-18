@@ -8,9 +8,12 @@ export function writeStep(resultsDir, resultPath, fileName, title, body) {
   const stepPath = path.join(resultsDir, fileName);
   writeUtf8Bom(stepPath, normalized);
 
+  const divider = '#=========================================================';
   const section = [
     '',
-    `## ${title}`,
+    divider,
+    `# ${title}`,
+    divider,
     '',
     normalized.trim(),
     '',
